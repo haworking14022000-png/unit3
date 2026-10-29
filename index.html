@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Từ Vựng Chuyên Ngành Luật - Legal English SRS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Flip Card Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .card-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-navy-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-gold-500 selection:text-navy-950">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="border-b border-slate-800 bg-navy-900/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-gold-600 to-gold-400 flex items-center justify-center shadow-lg shadow-gold-500/20">
+                        <i class="fa-solid fa-scale-balanced text-navy-950 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg text-white leading-none">LexiBrain Legal</h1>
+                        <p class="text-xs text-slate-400 mt-0.5">Tiếng Anh Pháp Lý & Ghi Nhớ Khoa Học</p>
+                    </div>
+                </div>
+
+                <!-- Unit Selector Dropdown & Stats -->
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <!-- Unit Filter Select -->
+                    <div class="relative">
+                        <select id="unit-select" onchange="changeUnitFilter()" class="bg-slate-800 border border-gold-500/40 text-gold-400 text-xs sm:text-sm font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-gold-500 appearance-none cursor-pointer">
+                            <option value="all">Tất cả bài học (60 từ)</option>
+                            <option value="1">Unit 1: Legal System (20 từ)</option>
+                            <option value="2">Unit 2: Sources of Law - Legislation (22 từ)</option>
+                            <option value="3" selected>Unit 3: Common Law & Precedents (18 từ)</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-gold-400 text-xs pointer-events-none"></i>
+                    </div>
+
+                    <!-- Stats Badges -->
+                    <div class="hidden md:flex items-center space-x-4 text-xs">
+                        <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+                            <i class="fa-solid fa-fire text-amber-500 animate-pulse"></i>
+                            <span class="text-slate-300">Streak: <strong id="streak-count" class="text-white">1</strong> ngày</span>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+                            <i class="fa-solid fa-brain text-gold-400"></i>
+                            <span class="text-slate-300">Thành thạo: <strong id="mastered-count" class="text-white">0/0</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Reset Data Button -->
+                    <button onclick="resetProgress()" class="text-xs text-slate-400 hover:text-rose-400 transition-colors p-2" title="Đặt lại tiến trình học">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Navigation Bar -->
+            <nav class="flex space-x-1 sm:space-x-3 overflow-x-auto border-t border-slate-800/50 pt-2 pb-2 scrollbar-none" id="tab-nav">
+                <button onclick="switchTab('flashcards')" id="tab-flashcards" class="tab-btn active px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-2 whitespace-nowrap bg-gold-500 text-navy-950 shadow-md shadow-gold-500/10">
+                    <i class="fa-solid fa-clone"></i>
+                    <span>Flashcards (Active Recall)</span>
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Trắc Nghiệm</span>
+                </button>
+                <button onclick="switchTab('typing')" id="tab-typing" class="tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-keyboard"></i>
+                    <span>Gõ Từ (Spelling)</span>
+                </button>
+                <button onclick="switchTab('matching')" id="tab-matching" class="tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                    <span>Game Nối Từ</span>
+                </button>
+                <button onclick="switchTab('dictionary')" id="tab-dictionary" class="tab-btn px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800 flex items-center space-x-2 whitespace-nowrap">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                    <span>Danh Sách Từ Vựng</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow flex flex-col items-center justify-center w-full">
+
+        <!-- 1. FLASHCARDS SECTION -->
+        <section id="sec-flashcards" class="w-full max-w-2xl flex flex-col items-center">
+            <!-- Learning Method Info Tip -->
+            <div class="w-full mb-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-center justify-between shadow-sm">
+                <span class="flex items-center space-x-2">
+                    <i class="fa-solid fa-brain text-gold-400 text-base"></i>
+                    <span><strong id="current-unit-title" class="text-gold-400">Unit 2</strong>: Tự đoán nghĩa trước khi lật thẻ để kích hoạt đường truyền thần kinh (Active Recall).</span>
+                </span>
+                <span id="card-progress-num" class="font-mono text-gold-400 font-bold ml-2">1 / 22</span>
+            </div>
+
+            <!-- Card Container -->
+            <div class="w-full h-80 sm:h-96 perspective-1000 cursor-pointer group" onclick="flipCard()">
+                <div id="flashcard-inner" class="card-inner relative w-full h-full transform-style-3d rounded-2xl border border-slate-700/60 bg-gradient-to-b from-navy-800 to-navy-900 shadow-2xl p-6 sm:p-8 flex flex-col justify-between">
+                    
+                    <!-- FRONT SIDE -->
+                    <div class="absolute inset-0 backface-hidden p-6 sm:p-8 flex flex-col justify-between rounded-2xl bg-gradient-to-b from-slate-800/90 to-navy-900">
+                        <div class="flex justify-between items-center w-full">
+                            <span id="fc-unit-badge" class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-700/50 text-gold-400 border border-gold-500/20 uppercase tracking-wider">UNIT 2</span>
+                            <button onclick="event.stopPropagation(); speakText(currentVocab.term)" class="w-10 h-10 rounded-full bg-slate-700/50 hover:bg-gold-500 hover:text-navy-950 text-slate-200 transition-all flex items-center justify-center shadow">
+                                <i class="fa-solid fa-volume-high text-lg"></i>
+                            </button>
+                        </div>
+
+                        <div class="text-center my-auto">
+                            <h2 id="fc-term" class="text-2xl sm:text-4xl font-extrabold text-white tracking-wide mb-2 px-2">sources of law</h2>
+                            <p id="fc-ipa" class="text-base sm:text-lg text-gold-400 font-serif italic tracking-wider">/'sɔ:sɪz əv lɔ:/</p>
+                        </div>
+
+                        <div class="text-center text-xs text-slate-400 flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-hand-pointer text-slate-500"></i>
+                            <span>Nhấn vào thẻ để xem đáp án tiếng Việt</span>
+                        </div>
+                    </div>
+
+                    <!-- BACK SIDE -->
+                    <div class="absolute inset-0 backface-hidden rotate-y-180 p-6 sm:p-8 flex flex-col justify-between rounded-2xl bg-gradient-to-b from-navy-900 to-slate-900 border border-gold-500/30">
+                        <div class="flex justify-between items-center w-full">
+                            <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/30 uppercase tracking-wider">ĐÁP ÁN & VÍ DỤ</span>
+                            <button onclick="event.stopPropagation(); speakText(currentVocab.term)" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-gold-500 hover:text-navy-950 text-slate-200 transition-all flex items-center justify-center">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+
+                        <div class="text-center my-auto">
+                            <h3 id="fc-meaning" class="text-xl sm:text-3xl font-bold text-gold-400 mb-3 px-2">nguồn của luật</h3>
+                            <div class="bg-slate-900/90 p-3 sm:p-4 rounded-xl border border-slate-800 text-left">
+                                <p id="fc-example" class="text-xs sm:text-sm text-slate-200 italic mb-1 font-serif">"Legislation and case law are main sources of law."</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center text-xs text-slate-400">
+                            <span>Đánh giá độ thuộc để hệ thống phân bổ ôn tập (SRS)</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Active Recall SRS Rating Buttons -->
+            <div class="w-full mt-6 grid grid-cols-3 gap-3 sm:gap-4">
+                <button onclick="rateVocabulary('hard')" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/50 text-rose-300 transition-all active:scale-95">
+                    <i class="fa-solid fa-face-frown text-xl mb-1 text-rose-400"></i>
+                    <span class="font-bold text-xs sm:text-sm">Chưa Thuộc</span>
+                    <span class="text-[10px] text-rose-400/70 mt-0.5">Ôn lại ngay</span>
+                </button>
+
+                <button onclick="rateVocabulary('medium')" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-amber-950/40 hover:bg-amber-900/60 border border-amber-800/50 text-amber-300 transition-all active:scale-95">
+                    <i class="fa-solid fa-face-meh text-xl mb-1 text-amber-400"></i>
+                    <span class="font-bold text-xs sm:text-sm">Tạm Nhớ</span>
+                    <span class="text-[10px] text-amber-400/70 mt-0.5">Ôn lại sớm</span>
+                </button>
+
+                <button onclick="rateVocabulary('easy')" class="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-800/50 text-emerald-300 transition-all active:scale-95">
+                    <i class="fa-solid fa-face-smile text-xl mb-1 text-emerald-400"></i>
+                    <span class="font-bold text-xs sm:text-sm">Thành Thạo</span>
+                    <span class="text-[10px] text-emerald-400/70 mt-0.5">Đã nhớ lâu</span>
+                </button>
+            </div>
+
+            <!-- Controls (Prev / Next) -->
+            <div class="flex items-center justify-between w-full mt-4 text-slate-400">
+                <button onclick="prevCard()" class="px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition flex items-center space-x-2 text-sm">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Thẻ trước</span>
+                </button>
+                <button onclick="shuffleCards()" class="p-2 rounded-lg hover:bg-slate-800 hover:text-gold-400 transition" title="Xáo trộn danh sách thẻ">
+                    <i class="fa-solid fa-shuffle"></i>
+                </button>
+                <button onclick="nextCard()" class="px-4 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition flex items-center space-x-2 text-sm">
+                    <span>Thẻ tiếp</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. MULTIPLE CHOICE QUIZ SECTION -->
+        <section id="sec-quiz" class="w-full max-w-2xl hidden flex-col items-center">
+            <div class="w-full bg-navy-900 rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl">
+                <!-- Quiz Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-gold-400 border border-slate-700">Kiểm Tra Gợi Nhớ (Active Recall)</span>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-xs text-slate-400">Điểm: <strong id="quiz-score" class="text-emerald-400 text-sm">0</strong></span>
+                        <span id="quiz-counter" class="text-xs font-mono text-slate-400">Câu 1/10</span>
+                    </div>
+                </div>
+
+                <!-- Question -->
+                <div class="text-center my-6">
+                    <p class="text-xs text-slate-400 mb-2">Chọn nghĩa Tiếng Việt đúng nhất cho thuật ngữ pháp lý:</p>
+                    <h3 id="quiz-question" class="text-2xl sm:text-3xl font-extrabold text-white">delegated legislation</h3>
+                    <p id="quiz-question-sub" class="text-sm text-gold-400 font-serif italic mt-1">/'delɪɡeɪtɪd ˌledʒɪs'leɪʃən/</p>
+                    <button id="quiz-audio-btn" onclick="speakCurrentQuiz()" class="mt-3 text-slate-400 hover:text-gold-400 text-sm inline-flex items-center space-x-1">
+                        <i class="fa-solid fa-volume-high"></i>
+                        <span>Nghe phát âm</span>
+                    </button>
+                </div>
+
+                <!-- Answer Options -->
+                <div id="quiz-options" class="grid grid-cols-1 gap-3 mt-6">
+                    <!-- Dynamic Buttons -->
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="quiz-feedback" class="mt-6 p-4 rounded-xl text-center font-medium text-sm hidden"></div>
+
+                <!-- Next Question Button -->
+                <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="w-full mt-4 py-3 bg-gold-500 hover:bg-gold-400 text-navy-950 font-bold rounded-xl shadow-lg transition hidden">
+                    Câu Tiếp Theo <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. TYPING / SPELLING TEST SECTION -->
+        <section id="sec-typing" class="w-full max-w-2xl hidden flex-col items-center">
+            <div class="w-full bg-navy-900 rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-gold-400 border border-slate-700">Luyện Gõ Đúng Từ</span>
+                    <span id="typing-counter" class="text-xs font-mono text-slate-400">Câu 1/10</span>
+                </div>
+
+                <div class="text-center my-6">
+                    <button onclick="speakTypingTarget()" class="w-14 h-14 rounded-full bg-gold-500/10 hover:bg-gold-500 hover:text-navy-950 text-gold-400 border border-gold-500/30 transition flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-volume-high text-2xl"></i>
+                    </button>
+                    <p class="text-xs text-slate-400 mb-1">Nghĩa tiếng Việt:</p>
+                    <h3 id="typing-meaning" class="text-2xl font-bold text-white mb-2">văn bản dưới luật</h3>
+                    <p id="typing-hint" class="text-xs font-mono text-gold-400/80 tracking-widest">Gợi ý độ dài từ</p>
+                </div>
+
+                <form onsubmit="checkTyping(event)" class="space-y-4">
+                    <div>
+                        <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="Nhập từ Tiếng Anh tại đây..." class="w-full bg-navy-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-lg font-semibold text-white focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gold-500 hover:bg-gold-400 text-navy-950 font-bold rounded-xl shadow-lg transition">
+                        Kiểm Tra Kết Quả
+                    </button>
+                </form>
+
+                <div id="typing-feedback" class="mt-6 p-4 rounded-xl text-center font-medium text-sm hidden"></div>
+            </div>
+        </section>
+
+        <!-- 4. MATCHING GAME SECTION -->
+        <section id="sec-matching" class="w-full max-w-4xl hidden flex-col items-center">
+            <div class="w-full mb-4 flex justify-between items-center bg-navy-900 p-4 rounded-xl border border-slate-800">
+                <div>
+                    <h3 class="font-bold text-white">Trò Chơi Nối Từ Pháp Lý</h3>
+                    <p class="text-xs text-slate-400">Ghép cặp thuật ngữ Tiếng Anh với đúng nghĩa Tiếng Việt</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs text-slate-400">Thời gian: <strong id="match-timer" class="text-gold-400 font-mono text-sm">0s</strong></span>
+                    <button onclick="initMatchingGame()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs rounded-lg text-slate-200 border border-slate-700">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Chơi lại
+                    </button>
+                </div>
+            </div>
+
+            <div id="matching-grid" class="w-full grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <!-- Dynamic Match Cards -->
+            </div>
+        </section>
+
+        <!-- 5. DICTIONARY & PROGRESS TABLE -->
+        <section id="sec-dictionary" class="w-full max-w-4xl hidden flex-col">
+            <div class="bg-navy-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                <div class="p-4 sm:p-6 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-white">Danh Sách Thuật Ngữ Pháp Lý</h3>
+                        <p class="text-xs text-slate-400" id="dict-subtitle">Tổng hợp từ vựng kèm phiên âm IPA và ví dụ</p>
+                    </div>
+                    <div class="relative w-full sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                        <input type="text" id="dict-search" oninput="filterDictionary()" placeholder="Tìm kiếm từ vựng..." class="w-full bg-navy-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-gold-500">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-900/80 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
+                                <th class="p-4">Bài học</th>
+                                <th class="p-4">Thuật Ngữ (English)</th>
+                                <th class="p-4">Phiên Âm IPA</th>
+                                <th class="p-4">Nghĩa Tiếng Việt</th>
+                                <th class="p-4 text-center">Trạng Thái SRS</th>
+                                <th class="p-4 text-center">Phát Âm</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dictionary-tbody" class="divide-y divide-slate-800/60">
+                            <!-- Dynamic Table Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-navy-900 py-4 text-center text-xs text-slate-500">
+        <p>LexiBrain Legal English • Ứng dụng Học Từ Vựng Pháp Lý Theo Khoa Học Não Bộ (SRS & Active Recall)</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // MASTER VOCABULARY DATASET (UNIT 1 + UNIT 2 + UNIT 3)
+        const allVocabData = [
+            // UNIT 1: Legal System (20 từ)
+            { id: 1, unit: 1, term: "legal system", ipa: "/ˈliːɡəl ˈsɪstəm/", meaning: "hệ thống pháp luật", example: "The legal system protects citizens' rights." },
+            { id: 2, unit: 1, term: "the structure of the law", ipa: "/ðə ˈstrʌktʃər əv ðə lɔː/", meaning: "cấu trúc của pháp luật", example: "We studied the structure of the law in our first semester." },
+            { id: 3, unit: 1, term: "constitution", ipa: "/ˌkɒnstɪˈtjuːʃən/", meaning: "hiến pháp", example: "The constitution is the supreme law of the land." },
+            { id: 4, unit: 1, term: "jurisdiction", ipa: "/ˌdʒʊərɪsˈdɪkʃən/", meaning: "thẩm quyền xét xử; phạm vi tài phán", example: "This court has jurisdiction over federal crimes." },
+            { id: 5, unit: 1, term: "common law", ipa: "/ˌkɒmən ˈlɔː/", meaning: "thông luật (luật chung)", example: "Common law is based on judicial precedents." },
+            { id: 6, unit: 1, term: "civil law", ipa: "/ˈsɪvəl ˈlɔː/", meaning: "dân luật; luật dân sự", example: "Civil law deals with disputes between individuals." },
+            { id: 7, unit: 1, term: "national law", ipa: "/ˈnæʃənəl ˈlɔː/", meaning: "luật quốc gia", example: "National law applies within a country's borders." },
+            { id: 8, unit: 1, term: "national sovereignty", ipa: "/ˈnæʃənəl ˈsɒvrənti/", meaning: "chủ quyền quốc gia", example: "Every nation must respect national sovereignty." },
+            { id: 9, unit: 1, term: "citizenship", ipa: "/ˈsɪtɪzənʃɪp/", meaning: "quyền công dân", example: "He applied for citizenship after five years of residence." },
+            { id: 10, unit: 1, term: "human rights", ipa: "/ˈhjuːmən raɪts/", meaning: "nhân quyền", example: "Human rights are fundamental rights for all people." },
+            { id: 11, unit: 1, term: "supremacy over", ipa: "/suːˈpreməsi ˈəʊvər/", meaning: "tính tối thượng; ưu thế hơn", example: "The supremacy over state law is guaranteed by the constitution." },
+            { id: 12, unit: 1, term: "substantive law", ipa: "/ˈsʌbstəntɪv lɔː/", meaning: "luật nội dung", example: "Substantive law defines rights and duties." },
+            { id: 13, unit: 1, term: "procedural law", ipa: "/prəˈsiːdʒərəl lɔː/", meaning: "luật tố tụng (luật thủ tục)", example: "Procedural law lays down rules for court trials." },
+            { id: 14, unit: 1, term: "statute law", ipa: "/ˈstætʃuːt lɔː/", meaning: "luật thành văn (do nghị viện ban hành)", example: "Statute law is created by legislative bodies." },
+            { id: 15, unit: 1, term: "case law", ipa: "/keɪs lɔː/", meaning: "án lệ", example: "Case law plays a vital role in legal arguments." },
+            { id: 16, unit: 1, term: "legislate", ipa: "/ˈledʒɪsleɪt/", meaning: "lập pháp; ban hành luật", example: "Parliament has the power to legislate on tax matters." },
+            { id: 17, unit: 1, term: "legislation", ipa: "/ˌledʒɪsˈleɪʃən/", meaning: "đạo luật; pháp chế", example: "New legislation was introduced to curb pollution." },
+            { id: 18, unit: 1, term: "legislative authority", ipa: "/ˈledʒɪslətɪv ɔːˈθɒrəti/", meaning: "cơ quan lập pháp", example: "The legislative authority rests with Parliament." },
+            { id: 19, unit: 1, term: "division", ipa: "/dɪˈvɪʒən/", meaning: "phân ngành; bộ phận", example: "The division of powers is a key democratic principle." },
+            { id: 20, unit: 1, term: "accession", ipa: "/əkˈseʃən/", meaning: "việc gia nhập", example: "The accession to the European Union took place in 2004." },
+
+            // UNIT 2: Sources of Law: Legislation (22 từ)
+            { id: 21, unit: 2, term: "sources of law", ipa: "/ˈsɔːsɪz əv lɔː/", meaning: "nguồn của luật", example: "Legislation and case law are main sources of law." },
+            { id: 22, unit: 2, term: "Act", ipa: "/ækt/", meaning: "đạo luật", example: "The new Act was passed by Parliament yesterday." },
+            { id: 23, unit: 2, term: "enact law", ipa: "/ɪˈnækt lɔː/", meaning: "ban hành luật", example: "Government officials plan to enact law regarding cyber security." },
+            { id: 24, unit: 2, term: "Bill", ipa: "/bɪl/", meaning: "dự luật", example: "Parliament will vote on the new tax Bill next week." },
+            { id: 25, unit: 2, term: "introduce a bill", ipa: "/ˌɪntrəˈdjuːs ə bɪl/", meaning: "trình dự luật", example: "A member of parliament can introduce a bill to the house." },
+            { id: 26, unit: 2, term: "pass an Act", ipa: "/pɑːs ən ækt/", meaning: "thông qua đạo luật", example: "Both houses must pass an Act before it becomes law." },
+            { id: 27, unit: 2, term: "draft legislation", ipa: "/drɑːft ˌledʒɪsˈleɪʃən/", meaning: "soạn thảo văn bản luật", example: "Legal experts spent months to draft legislation." },
+            { id: 28, unit: 2, term: "undertake (drafting of legislation)", ipa: "/ˌʌndəˈteɪk/", meaning: "đảm nhận (việc soạn thảo luật)", example: "The committee was asked to undertake drafting of legislation." },
+            { id: 29, unit: 2, term: "preamble", ipa: "/ˈpriːæmbəl/", meaning: "lời mở đầu (của đạo luật)", example: "The preamble sets out the fundamental principles of the statute." },
+            { id: 30, unit: 2, term: "Private Members Bill", ipa: "/ˈpraɪvət ˈmembəz bɪl/", meaning: "dự luật do nghị sĩ riêng đề xuất", example: "A Private Members Bill was introduced to protect local wildlife." },
+            { id: 31, unit: 2, term: "Public Act", ipa: "/ˈpʌblɪk ækt/", meaning: "đạo luật công", example: "A Public Act applies to the general public nationwide." },
+            { id: 32, unit: 2, term: "Private Act", ipa: "/ˈpraɪvət ækt/", meaning: "đạo luật tư", example: "A Private Act grants special legal powers to a specific entity." },
+            { id: 33, unit: 2, term: "primary legislation", ipa: "/ˈpraɪməri ˌledʒɪsˈleɪʃən/", meaning: "luật cơ bản (do Nghị viện ban hành)", example: "Primary legislation consists of Acts of Parliament." },
+            { id: 34, unit: 2, term: "secondary legislation", ipa: "/ˈsekəndri ˌledʒɪsˈleɪʃən/", meaning: "văn bản dưới luật", example: "Secondary legislation includes statutory instruments and regulations." },
+            { id: 35, unit: 2, term: "delegated legislation", ipa: "/ˈdelɪɡeɪtɪd ˌledʒɪsˈleɪʃən/", meaning: "luật ủy quyền", example: "Delegated legislation allows ministers to issue detailed rules." },
+            { id: 36, unit: 2, term: "statutory instruments", ipa: "/ˈstætʃətəri ˈɪnstrʊmənts/", meaning: "văn bản quy phạm pháp luật", example: "Statutory instruments are a common form of secondary legislation." },
+            { id: 37, unit: 2, term: "statutory regulations", ipa: "/ˈstætʃətəri ˌreɡjʊˈleɪʃənz/", meaning: "quy định pháp luật", example: "Mandatory statutory regulations must be observed strictly." },
+            { id: 38, unit: 2, term: "come into effect / come into force", ipa: "/kʌm ˈɪntuː ɪˈfɛkt/", meaning: "có hiệu lực", example: "The new traffic law will come into effect next month." },
+            { id: 39, unit: 2, term: "in force", ipa: "/ɪn fɔːs/", meaning: "đang có hiệu lực", example: "The regulation remains in force until amended by parliament." },
+            { id: 40, unit: 2, term: "repeal obsolete law", ipa: "/rɪˈpiːl ˌɒbsəˈliːt lɔː/", meaning: "bãi bỏ luật đã lỗi thời", example: "Parliament voted to repeal obsolete law from the last century." },
+            { id: 41, unit: 2, term: "consolidate laws", ipa: "/kənˈsɒlɪdeɪt lɔːz/", meaning: "hợp nhất các văn bản luật", example: "The legislation aims to consolidate laws into a single code." },
+            { id: 42, unit: 2, term: "codify rules", ipa: "/ˈkəʊdɪfaɪ ruːlz/", meaning: "pháp điển hóa các quy tắc", example: "Courts attempt to codify rules established by common law." },
+
+            // UNIT 3: Sources of Law: Common Law (18 từ)
+            { id: 43, unit: 3, term: "common law", ipa: "/ˌkɒmən ˈlɔː/", meaning: "thông luật", example: "Legal principles derived from judicial decisions rather than statutes." },
+            { id: 44, unit: 3, term: "judicial decisions", ipa: "/dʒuːˈdɪʃəl dɪˈsɪʒənz/", meaning: "phán quyết của tòa án", example: "Rulings made by judges in court cases." },
+            { id: 45, unit: 3, term: "judiciary", ipa: "/dʒuːˈdɪʃəri/", meaning: "ngành tư pháp; hệ thống tòa án", example: "The system of courts that interprets and applies the law." },
+            { id: 46, unit: 3, term: "hierarchy of the courts", ipa: "/ˈhaɪərɑːki əv ðə kɔːts/", meaning: "thứ bậc của các tòa án", example: "The ranking of courts from lower to higher authority." },
+            { id: 47, unit: 3, term: "binding precedent", ipa: "/ˈbaɪndɪŋ ˈpresɪdənt/", meaning: "tiền lệ bắt buộc", example: "A decision of a higher court that lower courts must follow." },
+            { id: 48, unit: 3, term: "binding on", ipa: "/ˈbaɪndɪŋ ɒn/", meaning: "ràng buộc đối với", example: "Imposing a legal obligation on a court or party." },
+            { id: 49, unit: 3, term: "bound to follow", ipa: "/baʊnd tə ˈfɒləʊ/", meaning: "có nghĩa vụ tuân theo", example: "Legally required to adhere to a previous decision." },
+            { id: 50, unit: 3, term: "cite a case", ipa: "/saɪt ə keɪs/", meaning: "viện dẫn án lệ", example: "To refer to a previous legal decision in support of an argument." },
+            { id: 51, unit: 3, term: "distinguish the case (from)", ipa: "/dɪˈstɪŋɡwɪʃ ðə keɪs/", meaning: "phân biệt vụ án (với ...)", example: "To show that a precedent does not apply because facts are different." },
+            { id: 52, unit: 3, term: "set the precedent", ipa: "/set ðə ˈpresɪdənt/", meaning: "tạo ra tiền lệ", example: "To establish a legal principle for the first time." },
+            { id: 53, unit: 3, term: "persuasive authority", ipa: "/pəˈsweɪsɪv ɔːˈθɒrəti/", meaning: "thẩm quyền thuyết phục (không bắt buộc)", example: "Legal sources that a court may consider but is not bound to follow." },
+            { id: 54, unit: 3, term: "stare decisis", ipa: "/ˌstɑːreɪ dɪˈsaɪsɪs/", meaning: "(Latin) nguyên tắc tuân thủ tiền lệ", example: "The doctrine that courts must adhere to precedent." },
+            { id: 55, unit: 3, term: "ratio decidendi", ipa: "/ˌreɪʃiəʊ ˌdesɪˈdendaɪ/", meaning: "(Latin) lý do quyết định - nguyên tắc của án", example: "The legal reasoning for the judge's decision." },
+            { id: 56, unit: 3, term: "obiter dictum", ipa: "/ˈɒbɪtə ˈdɪktəm/", meaning: "(Latin) ý kiến phụ - có giá trị tham khảo", example: "A judge's expression of opinion uttered in court, not essential to the decision." },
+            { id: 57, unit: 3, term: "case citation", ipa: "/keɪs saɪˈteɪʃən/", meaning: "trích dẫn án lệ", example: "A system used by legal professionals to identify past court cases." },
+            { id: 58, unit: 3, term: "law reports", ipa: "/lɔː rɪˈpɔːts/", meaning: "tập tin án lệ", example: "Published volumes of legal decisions made by courts." },
+            { id: 59, unit: 3, term: "series of law reports", ipa: "/ˈsɪəriːz əv lɔː rɪˈpɔːts/", meaning: "loạt tuyển tập án lệ", example: "A sequential collection of published law decisions." },
+            { id: 60, unit: 3, term: "All England Law Reports (All ER)", ipa: "/ɔːl ˈɪŋɡlənd lɔː rɪˈpɔːts/", meaning: "Tập án lệ Toàn Anh", example: "A well-known law report series containing judgments from English courts." }
+        ];
+
+        // STATE MANAGEMENT
+        let activeUnit = '3'; // Default to Unit 3
+
+        // INITIALIZATION
+        window.onload = function() {
+            filterVocabList();
+            initStats();
+            renderFlashcard();
+            renderDictionary();
+        };
+
+        function changeUnitFilter() {
+            activeUnit = document.getElementById('unit-select').value;
+            filterVocabList();
+            currentCardIndex = 0;
+            initStats();
+
+            if (activeTab === 'flashcards') renderFlashcard();
+            if (activeTab === 'quiz') startQuizMode();
+            if (activeTab === 'typing') startTypingMode();
+            if (activeTab === 'matching') initMatchingGame();
+            if (activeTab === 'dictionary') renderDictionary();
+        }
+
+        function filterVocabList() {
+            if (activeUnit === 'all') {
+                currentVocabList = [...allVocabData];
+                document.getElementById('current-unit-title').innerText = "Tất cả bài học";
+            } else {
+                const uNum = parseInt(activeUnit);
+                currentVocabList = allVocabData.filter(v => v.unit === uNum);
+                document.getElementById('current-unit-title').innerText = `Unit ${activeUnit}`;
+            }
+        }
+
+        // AUDIO TTS FUNCTION
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const cleanText = text.split('/')[0].split(';')[0];
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Trình duyệt của bạn không hỗ trợ phát âm âm thanh tự động.");
+            }
+        }
+
+        // NAVIGATION TABS
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-gold-500', 'text-navy-950', 'shadow-md');
+                btn.classList.add('text-slate-400', 'hover:text-white');
+            });
+
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-gold-500', 'text-navy-950', 'shadow-md');
+                activeBtn.classList.remove('text-slate-400', 'hover:text-white');
+            }
+
+            document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+
+            if (tabId === 'flashcards') renderFlashcard();
+            if (tabId === 'quiz') startQuizMode();
+            if (tabId === 'typing') startTypingMode();
+            if (tabId === 'matching') initMatchingGame();
+            if (tabId === 'dictionary') renderDictionary();
+        }
+
+        // STATS & PROGRESS LOGIC
+        function initStats() {
+            let mastered = 0;
+            currentVocabList.forEach(v => {
+                if (userProgress[v.id] === 'easy') mastered++;
+            });
+            document.getElementById('mastered-count').innerText = `${mastered}/${currentVocabList.length}`;
+            
+            let streak = localStorage.getItem('lexi_streak') || 1;
+            document.getElementById('streak-count').innerText = streak;
+        }
+
+        function resetProgress() {
+            if (confirm("Bạn có chắc chắn muốn xóa tất cả kết quả đánh giá để học lại từ đầu không?")) {
+                userProgress = {};
+                localStorage.removeItem('lexi_legal_progress_v2');
+                initStats();
+                renderFlashcard();
+                renderDictionary();
+            }
+        }
+
+        // 1. FLASHCARD CONTROLLER
+        let currentVocab = allVocabData[0];
+
+        function renderFlashcard() {
+            if (currentVocabList.length === 0) return;
+            if (currentCardIndex >= currentVocabList.length) currentCardIndex = 0;
+
+            currentVocab = currentVocabList[currentCardIndex];
+            isCardFlipped = false;
+            
+            const cardInner = document.getElementById('flashcard-inner');
+            cardInner.classList.remove('rotate-y-180');
+
+            document.getElementById('fc-unit-badge').innerText = `UNIT ${currentVocab.unit}`;
+            document.getElementById('fc-term').innerText = currentVocab.term;
+            document.getElementById('fc-ipa').innerText = currentVocab.ipa || '';
+            document.getElementById('fc-meaning').innerText = currentVocab.meaning;
+            document.getElementById('fc-example').innerText = `"${currentVocab.example}"`;
+            document.getElementById('card-progress-num').innerText = `${currentCardIndex + 1} / ${currentVocabList.length}`;
+        }
+
+        function flipCard() {
+            isCardFlipped = !isCardFlipped;
+            const cardInner = document.getElementById('flashcard-inner');
+            if (isCardFlipped) {
+                cardInner.classList.add('rotate-y-180');
+            } else {
+                cardInner.classList.remove('rotate-y-180');
+            }
+        }
+
+        function nextCard() {
+            currentCardIndex = (currentCardIndex + 1) % currentVocabList.length;
+            renderFlashcard();
+        }
+
+        function prevCard() {
+            currentCardIndex = (currentCardIndex - 1 + currentVocabList.length) % currentVocabList.length;
+            renderFlashcard();
+        }
+
+        function shuffleCards() {
+            currentVocabList.sort(() => Math.random() - 0.5);
+            currentCardIndex = 0;
+            renderFlashcard();
+        }
+
+        function rateVocabulary(level) {
+            userProgress[currentVocab.id] = level;
+            localStorage.setItem('lexi_legal_progress_v2', JSON.stringify(userProgress));
+            initStats();
+            nextCard();
+        }
+
+        // 2. QUIZ CONTROLLER
+        function startQuizMode() {
+            quizQuestions = [...currentVocabList].sort(() => Math.random() - 0.5);
+            currentQuizIndex = 0;
+            quizScore = 0;
+            document.getElementById('quiz-score').innerText = quizScore;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const feedback = document.getElementById('quiz-feedback');
+            const nextBtn = document.getElementById('quiz-next-btn');
+            feedback.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            if (currentQuizIndex >= quizQuestions.length) {
+                document.getElementById('quiz-question').innerText = "Hoàn Thành Bài Kiểm Tra!";
+                document.getElementById('quiz-question-sub').innerText = `Kết quả: Trả lời đúng ${quizScore}/${quizQuestions.length} câu.`;
+                document.getElementById('quiz-options').innerHTML = '';
+                document.getElementById('quiz-counter').innerText = '100%';
+                return;
+            }
+
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('quiz-counter').innerText = `Câu ${currentQuizIndex + 1}/${quizQuestions.length}`;
+            document.getElementById('quiz-question').innerText = q.term;
+            document.getElementById('quiz-question-sub').innerText = q.ipa || '';
+
+            // Generate Options (1 correct, 3 wrong from total pool)
+            let options = [q.meaning];
+            let otherMeanings = allVocabData.filter(v => v.meaning !== q.meaning).map(v => v.meaning);
+            otherMeanings.sort(() => Math.random() - 0.5);
+            options.push(...otherMeanings.slice(0, 3));
+            options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium transition active:scale-[0.99]";
+                btn.innerText = opt;
+                btn.onclick = () => selectQuizAnswer(opt, q.meaning, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function speakCurrentQuiz() {
+            if (quizQuestions[currentQuizIndex]) {
+                speakText(quizQuestions[currentQuizIndex].term);
+            }
+        }
+
+        function selectQuizAnswer(selected, correct, element) {
+            const allBtns = document.querySelectorAll('#quiz-options button');
+            allBtns.forEach(btn => btn.disabled = true);
+
+            const feedback = document.getElementById('quiz-feedback');
+            const nextBtn = document.getElementById('quiz-next-btn');
+
+            if (selected === correct) {
+                element.classList.remove('bg-slate-800/80', 'border-slate-700');
+                element.classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-300');
+                feedback.className = "mt-6 p-4 rounded-xl text-center font-medium text-sm bg-emerald-950/60 border border-emerald-800 text-emerald-300";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> Chính xác! Đã củng cố vào đường truyền thần kinh.`;
+                quizScore++;
+                document.getElementById('quiz-score').innerText = quizScore;
+            } else {
+                element.classList.remove('bg-slate-800/80', 'border-slate-700');
+                element.classList.add('bg-rose-950', 'border-rose-500', 'text-rose-300');
+                feedback.className = "mt-6 p-4 rounded-xl text-center font-medium text-sm bg-rose-950/60 border border-rose-800 text-rose-300";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark mr-2"></i> Chưa đúng! Đáp án đúng là: <strong>${correct}</strong>`;
+            }
+
+            feedback.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            renderQuizQuestion();
+        }
+
+        // 3. TYPING TEST CONTROLLER
+        function startTypingMode() {
+            typingQueue = [...currentVocabList].sort(() => Math.random() - 0.5);
+            currentTypingIndex = 0;
+            renderTypingQuestion();
+        }
+
+        function renderTypingQuestion() {
+            document.getElementById('typing-input').value = '';
+            document.getElementById('typing-feedback').classList.add('hidden');
+            
+            if (currentTypingIndex >= typingQueue.length) {
+                document.getElementById('typing-meaning').innerText = "Chúc mừng! Bạn đã hoàn thành bài tập chính tả!";
+                document.getElementById('typing-hint').innerText = "";
+                return;
+            }
+
+            const item = typingQueue[currentTypingIndex];
+            document.getElementById('typing-counter').innerText = `Câu ${currentTypingIndex + 1}/${typingQueue.length}`;
+            document.getElementById('typing-meaning').innerText = item.meaning;
+
+            // Generate mask hint for term
+            let rawTerm = item.term.split('/')[0].trim();
+            document.getElementById('typing-hint').innerText = `Gợi ý: Thuật ngữ có ${rawTerm.length} ký tự (Unit ${item.unit})`;
+
+            speakText(rawTerm);
+        }
+
+        function speakTypingTarget() {
+            if (typingQueue[currentTypingIndex]) {
+                const rawTerm = typingQueue[currentTypingIndex].term.split('/')[0].trim();
+                speakText(rawTerm);
+            }
+        }
+
+        function checkTyping(e) {
+            e.preventDefault();
+            const input = document.getElementById('typing-input').value.trim().toLowerCase();
+            const rawTarget = typingQueue[currentTypingIndex].term.split('/')[0].trim().toLowerCase();
+            const feedback = document.getElementById('typing-feedback');
+
+            if (input === rawTarget) {
+                feedback.className = "mt-6 p-4 rounded-xl text-center font-medium text-sm bg-emerald-950/60 border border-emerald-800 text-emerald-300";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> Chuẩn xác! Thuật ngữ: <strong>${typingQueue[currentTypingIndex].term}</strong>`;
+                feedback.classList.remove('hidden');
+                setTimeout(() => {
+                    currentTypingIndex++;
+                    renderTypingQuestion();
+                }, 1300);
+            } else {
+                feedback.className = "mt-6 p-4 rounded-xl text-center font-medium text-sm bg-rose-950/60 border border-rose-800 text-rose-300";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark mr-2"></i> Chưa chính xác! Đáp án đúng: <strong>${rawTarget}</strong>`;
+                feedback.classList.remove('hidden');
+            }
+        }
+
+        // 4. MATCHING GAME CONTROLLER
+        function initMatchingGame() {
+            clearInterval(matchTimerInterval);
+            matchSeconds = 0;
+            document.getElementById('match-timer').innerText = '0s';
+            matchTimerInterval = setInterval(() => {
+                matchSeconds++;
+                document.getElementById('match-timer').innerText = `${matchSeconds}s`;
+            }, 1000);
+
+            // Select 6 random vocab items from active list
+            const countToPick = Math.min(6, currentVocabList.length);
+            const selectedSet = [...currentVocabList].sort(() => Math.random() - 0.5).slice(0, countToPick);
+            matchCards = [];
+
+            selectedSet.forEach(item => {
+                matchCards.push({ id: item.id, type: 'term', text: item.term });
+                matchCards.push({ id: item.id, type: 'meaning', text: item.meaning });
+            });
+
+            matchCards.sort(() => Math.random() - 0.5);
+            selectedMatchCards = [];
+
+            const grid = document.getElementById('matching-grid');
+            grid.innerHTML = '';
+
+            matchCards.forEach((card, idx) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = "match-card h-24 p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-gold-500/50 flex items-center justify-center text-center cursor-pointer transition active:scale-95 shadow-md select-none text-xs sm:text-sm font-medium text-slate-200";
+                cardEl.innerText = card.text;
+                cardEl.dataset.idx = idx;
+                cardEl.onclick = () => handleMatchClick(card, cardEl);
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function handleMatchClick(card, element) {
+            if (element.classList.contains('matched') || selectedMatchCards.some(s => s.element === element)) return;
+
+            element.classList.add('border-gold-500', 'bg-gold-500/10', 'text-gold-400');
+            selectedMatchCards.push({ card, element });
+
+            if (selectedMatchCards.length === 2) {
+                const [first, second] = selectedMatchCards;
+
+                if (first.card.id === second.card.id && first.card.type !== second.card.type) {
+                    setTimeout(() => {
+                        first.element.classList.add('opacity-30', 'pointer-events-none', 'matched');
+                        second.element.classList.add('opacity-30', 'pointer-events-none', 'matched');
+                        first.element.classList.remove('border-gold-500', 'bg-gold-500/10', 'text-gold-400');
+                        second.element.classList.remove('border-gold-500', 'bg-gold-500/10', 'text-gold-400');
+                        selectedMatchCards = [];
+
+                        if (document.querySelectorAll('.matched').length === matchCards.length) {
+                            clearInterval(matchTimerInterval);
+                            alert(`Xuất sắc! Bạn đã nối hoàn tất tất cả các cặp từ trong ${matchSeconds} giây!`);
+                        }
+                    }, 250);
+                } else {
+                    setTimeout(() => {
+                        first.element.classList.remove('border-gold-500', 'bg-gold-500/10', 'text-gold-400');
+                        second.element.classList.remove('border-gold-500', 'bg-gold-500/10', 'text-gold-400');
+                        selectedMatchCards = [];
+                    }, 450);
+                }
+            }
+        }
+
+        // 5. DICTIONARY TABLE CONTROLLER
+        function renderDictionary() {
+            const tbody = document.getElementById('dictionary-tbody');
+            tbody.innerHTML = '';
+            document.getElementById('dict-subtitle').innerText = `Đang hiển thị ${currentVocabList.length} từ vựng thuộc danh mục đã chọn.`;
+
+            currentVocabList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition border-b border-slate-800/40";
+                
+                const status = userProgress[item.id] || 'chưa học';
+                let statusBadge = '<span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Chưa học</span>';
+                if (status === 'easy') statusBadge = '<span class="text-[11px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Thành thạo</span>';
+                if (status === 'medium') statusBadge = '<span class="text-[11px] px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800">Tạm nhớ</span>';
+                if (status === 'hard') statusBadge = '<span class="text-[11px] px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800">Cần ôn lại</span>';
+
+                tr.innerHTML = `
+                    <td class="p-4 font-mono text-xs text-gold-400/80">Unit ${item.unit}</td>
+                    <td class="p-4 font-bold text-white">${item.term}</td>
+                    <td class="p-4 text-gold-400 font-serif text-xs">${item.ipa || '-'}</td>
+                    <td class="p-4 text-slate-300">${item.meaning}</td>
+                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="speakText('${item.term}')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-gold-500 hover:text-navy-950 text-slate-300 transition inline-flex items-center justify-center">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterDictionary() {
+            const query = document.getElementById('dict-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#dictionary-tbody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
